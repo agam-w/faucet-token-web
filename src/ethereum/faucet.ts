@@ -1,3 +1,5 @@
+import { ethers } from 'ethers'
+
 export const abi = [
   {
     inputs: [
@@ -144,3 +146,7 @@ export const abi = [
     type: 'function',
   },
 ]
+
+export const faucetContract = (provider: any) => {
+  return new ethers.Contract('0x2242aA2e931Bc5C8AD59886763fBBD5B7754E4fE', abi, provider)
+}

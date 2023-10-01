@@ -1,10 +1,88 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dialog, Popover } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useStore } from '@nanostores/react'
+import { $fcContract, $signer, $walletAddress } from '@/stores/wallet'
+import { ethers } from 'ethers'
+import { faucetContract } from '@/ethereum/faucet'
 
 export default function Example() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const walletAddress = useStore($walletAddress)
+
+  useEffect(() => {
+    getCurrentWalletConnected()
+    addWalletListener()
+  }, [walletAddress])
+
+  // const connectWallet = () => {
+  // let provider = ethers.getDefaultProvider()
+  // }
+
+  const connectWallet = async () => {
+    if (typeof window != 'undefined' && typeof window.ethereum != 'undefined') {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum)
+        const accounts = await provider.send('eth_requestAccounts', [])
+        $signer.set(await provider.getSigner())
+        $fcContract.set(faucetContract(provider))
+
+        /* MetaMask is installed */
+        // const accounts = await window.ethereum.request({
+        //   method: 'eth_requestAccounts',
+        // })
+        $walletAddress.set(accounts[0])
+        console.log(accounts[0])
+      } catch (err) {
+        console.error(err.message)
+      }
+    } else {
+      /* MetaMask is not installed */
+      console.log('Please install MetaMask')
+    }
+  }
+
+  const getCurrentWalletConnected = async () => {
+    if (typeof window != 'undefined' && typeof window.ethereum != 'undefined') {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum)
+        const accounts = await provider.send('eth_accounts', [])
+
+        // const accounts = await window.ethereum.request({
+        //   method: 'eth_accounts',
+        // })
+        if (accounts.length > 0) {
+          $signer.set(await provider.getSigner())
+          $fcContract.set(faucetContract(provider))
+
+          $walletAddress.set(accounts[0])
+          console.log(accounts[0])
+        } else {
+          console.log('Connect to MetaMask using the Connect button')
+        }
+      } catch (err) {
+        console.error(err.message)
+      }
+    } else {
+      /* MetaMask is not installed */
+      console.log('Please install MetaMask')
+    }
+  }
+
+  const addWalletListener = async () => {
+    if (typeof window != 'undefined' && typeof window.ethereum != 'undefined') {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        $walletAddress.set(accounts[0])
+        console.log(accounts[0])
+      })
+    } else {
+      /* MetaMask is not installed */
+      $walletAddress.set('')
+      console.log('Please install MetaMask')
+    }
+  }
 
   return (
     <header className="">
@@ -26,8 +104,10 @@ export default function Example() {
           </button>
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="#" className="text-sm font-semibold leading-6 ">
-            Log in
+          <a href="#" className="text-sm font-semibold leading-6 " onClick={connectWallet}>
+            {walletAddress && walletAddress.length > 0
+              ? `Connected: ${walletAddress.substring(0, 6)}...${walletAddress.substring(38)}`
+              : 'Connect Wallet'}
           </a>
         </div>
       </nav>
@@ -55,8 +135,11 @@ export default function Example() {
                 <a
                   href="#"
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7  hover:bg-gray-50"
+                  onClick={connectWallet}
                 >
-                  Log in
+                  {walletAddress && walletAddress.length > 0
+                    ? `Connected: ${walletAddress.substring(0, 6)}...${walletAddress.substring(38)}`
+                    : 'Connect Wallet'}
                 </a>
               </div>
             </div>

@@ -1,9 +1,28 @@
+'use client'
 import Button from '@/components/Button'
 import Container from '@/components/Container'
 import Header from '@/components/Header'
 import Input from '@/components/Input'
+import { $fcContract, $signer, $walletAddress } from '@/stores/wallet'
+import { useStore } from '@nanostores/react'
 
 export default function Home() {
+  const walletAddress = useStore($walletAddress)
+  const signer = useStore($signer)
+  const fcContract = useStore($fcContract)
+
+  const getTokenHandler = async () => {
+    try {
+      if (!signer) throw Error('undefined signer')
+      const fcContractWithSigner = fcContract?.connect(signer)
+      const resp = await fcContractWithSigner?.requestTokens()
+      console.log('get tokens success')
+      console.log(resp)
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
+
   return (
     <>
       <Header />
@@ -18,9 +37,9 @@ export default function Home() {
           <div className="space-y-4 rounded-xl border-2 border-gray-500/30 p-6 lg:p-8">
             <div className="flex flex-col space-y-4 text-lg lg:flex-row lg:space-x-4 lg:space-y-0">
               <div className="flex-1">
-                <Input placeholder="Enter your wallet address (0x..)" />
+                <Input placeholder="Enter your wallet address (0x..)" value={walletAddress} />
               </div>
-              <Button>Send Me ETH</Button>
+              <Button onClick={getTokenHandler}>Send Me ETH</Button>
             </div>
 
             <div className="pb-8">

@@ -11,6 +11,9 @@
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
+    "@nanostores/react": "^0.7.1",
+    "ethers": "^6.7.1",
+    "nanostores": "^0.9.3",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest"
