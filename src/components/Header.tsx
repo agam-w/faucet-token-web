@@ -13,22 +13,25 @@ export default function Example() {
   const walletAddress = useStore($walletAddress)
 
   // test without using connect wallet
-  // useEffect(() => {
-  //   initProvider()
-  // }, [])
+  useEffect(() => {
+    initProvider()
+  }, [])
 
   const initProvider = async () => {
     console.log('initProvider')
     let provider = new ethers.AlchemyProvider()
-    $signer.set(await provider.getSigner())
+    // signer using wallet private key
+    const wallet = new ethers.Wallet('WALLET_PRIVATE_KEY', provider)
+    console.log({ wallet })
+    $signer.set(wallet)
     $fcContract.set(faucetContract(provider))
   }
 
   // using connect wallet
-  useEffect(() => {
-    getCurrentWalletConnected()
-    addWalletListener()
-  }, [walletAddress])
+  // useEffect(() => {
+  //   getCurrentWalletConnected()
+  //   addWalletListener()
+  // }, [walletAddress])
 
   const connectWallet = async () => {
     if (typeof window != 'undefined' && typeof window.ethereum != 'undefined') {
