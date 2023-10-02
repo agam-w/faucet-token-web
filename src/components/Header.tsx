@@ -12,14 +12,23 @@ export default function Example() {
 
   const walletAddress = useStore($walletAddress)
 
+  // test without using connect wallet
+  // useEffect(() => {
+  //   initProvider()
+  // }, [])
+
+  const initProvider = async () => {
+    console.log('initProvider')
+    let provider = new ethers.AlchemyProvider()
+    $signer.set(await provider.getSigner())
+    $fcContract.set(faucetContract(provider))
+  }
+
+  // using connect wallet
   useEffect(() => {
     getCurrentWalletConnected()
     addWalletListener()
   }, [walletAddress])
-
-  // const connectWallet = () => {
-  // let provider = ethers.getDefaultProvider()
-  // }
 
   const connectWallet = async () => {
     if (typeof window != 'undefined' && typeof window.ethereum != 'undefined') {
@@ -36,7 +45,9 @@ export default function Example() {
         $walletAddress.set(accounts[0])
         console.log(accounts[0])
       } catch (err) {
-        console.error(err.message)
+        if (err instanceof Error) {
+          console.error(err.message)
+        }
       }
     } else {
       /* MetaMask is not installed */
@@ -63,7 +74,9 @@ export default function Example() {
           console.log('Connect to MetaMask using the Connect button')
         }
       } catch (err) {
-        console.error(err.message)
+        if (err instanceof Error) {
+          console.error(err.message)
+        }
       }
     } else {
       /* MetaMask is not installed */
@@ -73,7 +86,7 @@ export default function Example() {
 
   const addWalletListener = async () => {
     if (typeof window != 'undefined' && typeof window.ethereum != 'undefined') {
-      window.ethereum.on('accountsChanged', (accounts) => {
+      window.ethereum.on('accountsChanged', (accounts: any) => {
         $walletAddress.set(accounts[0])
         console.log(accounts[0])
       })

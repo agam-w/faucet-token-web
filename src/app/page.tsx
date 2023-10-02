@@ -5,21 +5,26 @@ import Header from '@/components/Header'
 import Input from '@/components/Input'
 import { $fcContract, $signer, $walletAddress } from '@/stores/wallet'
 import { useStore } from '@nanostores/react'
+import { useState } from 'react'
 
 export default function Home() {
   const walletAddress = useStore($walletAddress)
   const signer = useStore($signer)
   const fcContract = useStore($fcContract)
 
+  const [toAddress, setToAddress] = useState('')
+
   const getTokenHandler = async () => {
     try {
       if (!signer) throw Error('undefined signer')
       const fcContractWithSigner = fcContract?.connect(signer)
-      const resp = await fcContractWithSigner?.requestTokens()
+      const resp = await fcContractWithSigner?.requestTokens(toAddress)
       console.log('get tokens success')
       console.log(resp)
     } catch (error) {
-      console.error(error.message)
+      if (error instanceof Error) {
+        console.error(error.message)
+      }
     }
   }
 
@@ -37,7 +42,11 @@ export default function Home() {
           <div className="space-y-4 rounded-xl border-2 border-gray-500/30 p-6 lg:p-8">
             <div className="flex flex-col space-y-4 text-lg lg:flex-row lg:space-x-4 lg:space-y-0">
               <div className="flex-1">
-                <Input placeholder="Enter your wallet address (0x..)" value={walletAddress} />
+                <Input
+                  placeholder="Enter your wallet address (0x..)"
+                  value={toAddress}
+                  onChange={(e) => setToAddress(e.target.value)}
+                />
               </div>
               <Button onClick={getTokenHandler}>Send Me ETH</Button>
             </div>
