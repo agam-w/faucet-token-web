@@ -10,22 +10,7 @@ import { faucetContract } from '@/ethereum/faucet'
 export default function Example() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const walletAddress = useStore($walletAddress)
-
-  // test without using connect wallet
-  useEffect(() => {
-    initProvider()
-  }, [])
-
-  const initProvider = async () => {
-    console.log('initProvider')
-    let provider = new ethers.AlchemyProvider()
-    // signer using wallet private key
-    const wallet = new ethers.Wallet('WALLET_PRIVATE_KEY', provider)
-    console.log({ wallet })
-    $signer.set(wallet)
-    $fcContract.set(faucetContract(provider))
-  }
+  // const walletAddress = useStore($walletAddress)
 
   // using connect wallet
   // useEffect(() => {
@@ -120,11 +105,13 @@ export default function Example() {
           </button>
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+          {/*
           <a href="#" className="text-sm font-semibold leading-6 " onClick={connectWallet}>
             {walletAddress && walletAddress.length > 0
               ? `Connected: ${walletAddress.substring(0, 6)}...${walletAddress.substring(38)}`
               : 'Connect Wallet'}
           </a>
+          */}
         </div>
       </nav>
       <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
@@ -148,6 +135,7 @@ export default function Example() {
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6"></div>
               <div className="py-6">
+                {/*
                 <a
                   href="#"
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7  hover:bg-gray-50"
@@ -157,6 +145,7 @@ export default function Example() {
                     ? `Connected: ${walletAddress.substring(0, 6)}...${walletAddress.substring(38)}`
                     : 'Connect Wallet'}
                 </a>
+                */}
               </div>
             </div>
           </div>
